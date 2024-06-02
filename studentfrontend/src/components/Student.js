@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { Container, Paper, Button } from '@mui/material';
@@ -7,10 +7,10 @@ export default function Student() {
     const paperStyle = { padding: '50px 20px', width: 600, margin: "20px auto" }
     const [name, setName] = useState('')
     const [address, setAddress] = useState('');
+    const [student, setStudent] = useState([]);
     const handleClick = (e) => {
         e.preventDefault();
         const student = { name, address };
-        console.log(name);
         fetch("http://localhost:8080/student/add", {
             method: "POST",
             headeres: { "content-Type": "application/json" },
@@ -23,6 +23,16 @@ export default function Student() {
         );
 
     }
+    useEffect(() => {
+        const data = [{ id: 1, name: "aaaa1", address: "Chicago" }, { id: 2, name: "aaaa2", address: "Mumbai" }];
+        setStudent(data)
+        fetch("http://localhost:8080/student/getAll")
+            .then(res => res.json())
+            .then((result) => {
+                //setStudent(result);
+            })
+            .catch((error) => console.log("cant fetch data from DB"))
+    }, [])
     return (
         <Container>
             <Paper elevation={3} style={paperStyle}>
@@ -49,6 +59,17 @@ export default function Student() {
 
                 </Box>
             </Paper>
-        </Container>
+            <Paper elevation={3} style={paperStyle}>
+                <h1 style={{ color: "blue" }}>Student List</h1>
+                {student.map(std => (
+                    <Paper elevation={6} style={{ margin: "10px", padding: "10px", textAlign: "left" }} key={std.id}>
+                        Id: {std.id}<br />
+                        Name: {std.name}<br />
+                        Adddress: {std.address}<br />
+                    </Paper>
+                ))
+                }
+            </Paper>
+        </Container >
     );
 }
